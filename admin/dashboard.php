@@ -122,6 +122,7 @@ $conn->close();
         <div class="menu">
             <a href="dashboard.php" style="color: #f36100;">Dashboard</a>
             <a href="clientes.php">Clientes</a>
+            <a href="rutinas.php">Rutinas</a>
             <a href="logout.php">Cerrar Sesión</a>
         </div>
     </nav>
@@ -150,6 +151,10 @@ $conn->close();
             <a href="cliente_form.php" class="action-btn">
                 <h4>Nuevo Cliente</h4>
                 <p>Dar de alta un socio</p>
+            </a>
+            <a href="rutinas.php" class="action-btn">
+                <h4>Rutinas</h4>
+                <p>Crear y editar ejercicios</p>
             </a>
         </div>
     </div>

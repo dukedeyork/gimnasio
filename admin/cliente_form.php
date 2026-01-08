@@ -13,6 +13,9 @@ $dni = '';
 $email = '';
 $telefono = '';
 $fecha_nacimiento = '';
+$genero = 'hombre'; // Default
+$tipo_plan = 1;
+$fecha_ingreso = date('Y-m-d'); // Default to today
 $is_edit = false;
 $msg = '';
 $error = '';
@@ -34,6 +37,9 @@ if (isset($_GET['id'])) {
         $email = $row['email'];
         $telefono = $row['telefono'];
         $fecha_nacimiento = $row['fecha_nacimiento'];
+        $genero = isset($row['genero']) ? $row['genero'] : 'hombre';
+        $tipo_plan = isset($row['tipo_plan']) ? $row['tipo_plan'] : 1;
+        $fecha_ingreso = isset($row['fecha_ingreso']) ? $row['fecha_ingreso'] : date('Y-m-d');
     }
     $stmt->close();
 }
@@ -46,29 +52,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $telefono = trim($_POST['telefono']);
     $fecha_nacimiento = $_POST['fecha_nacimiento'];
+    $genero = $_POST['genero'];
+    $tipo_plan = intval($_POST['tipo_plan']);
+    $fecha_ingreso = $_POST['fecha_ingreso'];
+    $password = $_POST['password'];
 
     if (empty($nombre) || empty($apellido) || empty($dni)) {
         $error = "Nombre, Apellido y DNI son obligatorios.";
     } else {
         if ($is_edit) {
             // Update
-            $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=? WHERE id=?");
-            $stmt->bind_param("ssssssi", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $id);
+            // Password only updated if not empty
+            if (!empty($password)) {
+                $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=?, password=? WHERE id=?");
+                $stmt->bind_param("sssssssissi", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $hashed_pass, $id);
+            } else {
+                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=? WHERE id=?");
+                $stmt->bind_param("sssssssisi", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $id);
+            }
+
             if ($stmt->execute()) {
                 $msg = "Cliente actualizado correctamente.";
             } else {
-                $error = "Error al actualizar (posible DNI duplicado).";
+                $error = "Error al actualizar (posible DNI duplicado). " . $conn->error;
             }
         } else {
             // Insert
-            $stmt = $conn->prepare("INSERT INTO clientes (nombre, apellido, dni, email, telefono, fecha_nacimiento) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento);
+            $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO clientes (nombre, apellido, dni, email, telefono, fecha_nacimiento, genero, tipo_plan, fecha_ingreso, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssiss", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $hashed_pass);
+
             if ($stmt->execute()) {
                 $msg = "Cliente creado exitosamente.";
                 // Limpiar form
                 $nombre = $apellido = $dni = $email = $telefono = $fecha_nacimiento = '';
+                $genero = 'hombre';
+                $tipo_plan = 1;
+                $fecha_ingreso = date('Y-m-d');
             } else {
-                $error = "Error al crear (posible DNI duplicado).";
+                $error = "Error al crear (posible DNI duplicado). " . $conn->error;
             }
         }
         if (isset($stmt))
@@ -144,7 +167,8 @@ $conn->close();
             color: #555;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #ddd;
@@ -239,7 +263,7 @@ $conn->close();
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="dni">DNI / Identificación *</label>
+                        <label for="dni">DNI / Identificación * (Usuario)</label>
                         <input type="text" id="dni" name="dni" value="<?php echo htmlspecialchars($dni); ?>" required>
                     </div>
                     <div class="form-group">
@@ -251,24 +275,57 @@ $conn->close();
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="genero">Género</label>
+                        <select id="genero" name="genero">
+                            <option value="hombre" <?php echo ($genero == 'hombre') ? 'selected' : ''; ?>>Hombre</option>
+                            <option value="mujer" <?php echo ($genero == 'mujer') ? 'selected' : ''; ?>>Mujer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
                     </div>
-                    <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" id="telefono" name="telefono"
-                            value="<?php echo htmlspecialchars($telefono); ?>">
-                    </div>
                 </div>
-
-                <div style="margin-top: 1rem;">
-                    <button type="submit" class="btn-submit">
-                        <?php echo $is_edit ? 'Guardar Cambios' : 'Registrar Cliente'; ?>
-                    </button>
-                    <a href="clientes.php" class="btn-cancel">Cancelar</a>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" id="telefono" name="telefono" value="<?php echo htmlspecialchars($telefono); ?>">
                 </div>
-            </form>
         </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="tipo_plan">Tipo de Plan (Meses)</label>
+                <select id="tipo_plan" name="tipo_plan">
+                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                        <option value="<?php echo $i; ?>" <?php echo ($tipo_plan == $i) ? 'selected' : ''; ?>>
+                            <?php echo $i . ' Mes' . ($i > 1 ? 'es' : ''); ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fecha_ingreso">Fecha de Ingreso</label>
+                <input type="date" id="fecha_ingreso" name="fecha_ingreso"
+                    value="<?php echo htmlspecialchars($fecha_ingreso); ?>">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña
+                <?php echo $is_edit ? '(Dejar en blanco para mantener la actual)' : '*'; ?></label>
+            <input type="password" id="password" name="password" <?php echo $is_edit ? '' : 'required'; ?>>
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <button type="submit" class="btn-submit">
+                <?php echo $is_edit ? 'Guardar Cambios' : 'Registrar Cliente'; ?>
+            </button>
+            <a href="clientes.php" class="btn-cancel">Cancelar</a>
+        </div>
+        </form>
+    </div>
     </div>
 </body>
 

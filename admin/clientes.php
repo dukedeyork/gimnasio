@@ -154,6 +154,7 @@ $result = $conn->query($sql);
         <div class="menu">
             <a href="dashboard.php">Dashboard</a>
             <a href="clientes.php" style="color: #f36100;">Clientes</a>
+            <a href="rutinas.php">Rutinas</a>
             <a href="logout.php">Cerrar Sesión</a>
         </div>
     </nav>
@@ -178,14 +179,57 @@ $result = $conn->query($sql);
                             <th>#</th>
                             <th>Nombre</th>
                             <th>DNI</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Registro</th>
+                            <th>Género</th>
+                            <th>Plan</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Transcurrido</th>
+                            <th>Restante</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
+                        <?php
+                        $today = new DateTime();
+                        while ($row = $result->fetch_assoc()):
+                            $tipo_plan = isset($row['tipo_plan']) ? intval($row['tipo_plan']) : 1;
+                            $ingreso = isset($row['fecha_ingreso']) ? $row['fecha_ingreso'] : null;
+
+                            $transcurrido_str = "N/A";
+                            $restante_str = "N/A";
+                            $color_restante = "#333";
+
+                            if ($ingreso) {
+                                $fecha_ingreso_dt = new DateTime($ingreso);
+                                // Calcular fecha de vencimiento (sumando meses del plan)
+                                // Clonamos para no modificar la original si la usáramos después, aunque aquí es directo
+                                $fecha_vencimiento = clone $fecha_ingreso_dt;
+                                $fecha_vencimiento->modify("+$tipo_plan months");
+
+                                // Días transcurridos (Ingreso -> Hoy)
+                                // Si fecha ingreso es hoy o pasado:
+                                if ($today >= $fecha_ingreso_dt) {
+                                    $diff_trans = $fecha_ingreso_dt->diff($today);
+                                    $transcurrido_str = $diff_trans->days . " d";
+                                } else {
+                                    $transcurrido_str = "0 d (Futuro)";
+                                }
+
+                                // Días restantes (Hoy -> Vencimiento)
+                                if ($fecha_vencimiento > $today) {
+                                    $diff_rest = $today->diff($fecha_vencimiento);
+                                    $restante_str = $diff_rest->days . " días";
+                                    if ($diff_rest->days < 5)
+                                        $color_restante = "#dc2626"; // Alerta rojo
+                                    elseif ($diff_rest->days < 10)
+                                        $color_restante = "#f59e0b"; // Alerta naranja
+                                    else
+                                        $color_restante = "#10b981"; // Verde
+                                } else {
+                                    $restante_str = "Vencido";
+                                    $color_restante = "#dc2626";
+                                }
+                            }
+                            ?>
                             <tr>
                                 <td>
                                     <?php echo $row['id']; ?>
@@ -197,15 +241,23 @@ $result = $conn->query($sql);
                                     <?php echo htmlspecialchars($row['dni']); ?>
                                 </td>
                                 <td>
-                                    <?php echo htmlspecialchars($row['email']); ?>
+                                    <?php echo ucfirst(htmlspecialchars(isset($row['genero']) ? $row['genero'] : 'hombre')); ?>
                                 </td>
                                 <td>
-                                    <?php echo htmlspecialchars($row['telefono']); ?>
+                                    <?php echo $tipo_plan . ' Mes' . ($tipo_plan > 1 ? 'es' : ''); ?>
                                 </td>
                                 <td>
-                                    <?php echo date('d/m/Y', strtotime($row['fecha_registro'])); ?>
+                                    <?php echo $ingreso ? date('d/m/Y', strtotime($ingreso)) : '-'; ?>
+                                </td>
+                                <td>
+                                    <?php echo $transcurrido_str; ?>
+                                </td>
+                                <td style="color: <?php echo $color_restante; ?>; font-weight: bold;">
+                                    <?php echo $restante_str; ?>
                                 </td>
                                 <td class="actions">
+                                    <a href="asignar_rutinas.php?cliente_id=<?php echo $row['id']; ?>" class="btn"
+                                        style="background-color: #8b5cf6; font-size: 0.9rem; padding: 0.25rem 0.5rem;">Rutina</a>
                                     <a href="cliente_form.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Editar</a>
                                     <a href="clientes.php?delete=<?php echo $row['id']; ?>" class="btn btn-danger"
                                         onclick="return confirm('¿Seguro que deseas eliminar este cliente?')">Borrar</a>

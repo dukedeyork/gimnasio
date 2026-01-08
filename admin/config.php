@@ -3,9 +3,9 @@
 // Debes cambiar estos valores por los que te proporcione DonWeb
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'nombre_base_datos'); // Cambiar por el nombre real
-define('DB_USER', 'usuario_db');        // Cambiar por el usuario real
-define('DB_PASS', 'password_db');       // Cambiar por la contraseña real
+define('DB_NAME', 'megafit'); // Cambiar por el nombre real
+define('DB_USER', 'root');        // Cambiar por el usuario real
+define('DB_PASS', '');       // Cambiar por la contraseña real
 
 function getDB() {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);

@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once 'config.php';
+require_once '../admin/config.php';
 
 // Si ya está logueado, ir al dashboard
-if (isset($_SESSION['admin_id'])) {
+if (isset($_SESSION['cliente_id'])) {
     header("Location: dashboard.php");
     exit;
 }
@@ -11,31 +11,33 @@ if (isset($_SESSION['admin_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username']);
+    $dni = trim($_POST['dni']);
     $password = $_POST['password'];
 
-    if (empty($username) || empty($password)) {
-        $error = "Por favor ingrese usuario y contraseña.";
+    if (empty($dni) || empty($password)) {
+        $error = "Por favor ingrese su DNI y contraseña.";
     } else {
         $conn = getDB();
-        $stmt = $conn->prepare("SELECT id, password FROM admin_users WHERE username = ?");
-        $stmt->bind_param("s", $username);
+        $stmt = $conn->prepare("SELECT id, nombre, apellido, password FROM clientes WHERE dni = ? AND activo = 1");
+        $stmt->bind_param("s", $dni);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $hashed_password);
+            $stmt->bind_result($id, $nombre, $apellido, $hashed_password);
             $stmt->fetch();
-            if (password_verify($password, $hashed_password)) {
-                $_SESSION['admin_id'] = $id;
-                $_SESSION['admin_username'] = $username;
+
+            // Verificar contraseña
+            if ($hashed_password && password_verify($password, $hashed_password)) {
+                $_SESSION['cliente_id'] = $id;
+                $_SESSION['cliente_nombre'] = $nombre . ' ' . $apellido;
                 header("Location: dashboard.php");
                 exit;
             } else {
-                $error = "Contraseña incorrecta.";
+                $error = "Contraseña incorrecta o usuario no configurado.";
             }
         } else {
-            $error = "Usuario no encontrado.";
+            $error = "Cliente no encontrado (o inactivo).";
         }
         $stmt->close();
         $conn->close();
@@ -48,11 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Administración - Gimnasio</title>
-    <!-- Reutilizamos CSS principal si es posible o uno minimalista -->
-    <link rel="stylesheet" href="../css/style.css">
+    <title>Login Clientes - Gimnasio</title>
     <style>
         body.login-body {
+            font-family: sans-serif;
             background-image: linear-gradient(to bottom, #0a0a0a, #f35904 );
             display: flex;
             justify-content: center;
@@ -114,14 +115,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #dc2626;
             text-align: center;
             margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body class="login-body">
     <div class="login-card">
-        <a href="../index.html"><img src="../img/logo.png" alt="Logo" style="margin-left:auto; margin-right:auto; margin-bottom:2rem; display:block"></a>
-        <h2>Panel Administrativo</h2>
+        <a href="../index.html"><img src="../img/logo.png" alt="Logo" style="margin-left:auto; margin-right:auto; display:block"></a>
+        <h2>Acceso Clientes</h2>
         <?php if ($error): ?>
             <div class="error-msg">
                 <?php echo htmlspecialchars($error); ?>
@@ -129,8 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form method="POST" action="">
             <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" required autofocus>
+                <label for="dni">DNI / Identificación</label>
+                <input type="text" id="dni" name="dni" required autofocus>
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
@@ -138,6 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
         </form>
+        <a href="../index.html" class="back-link">Volver al sitio</a>
     </div>
 </body>
 
