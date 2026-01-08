@@ -67,6 +67,7 @@ $conn->close();
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;;
         }
 
         .stat-card h3 {
@@ -128,9 +129,9 @@ $conn->close();
     </nav>
 
     <div class="container">
-        <h1>Bienvenido,
+        <h2>Bienvenido,
             <?php echo htmlspecialchars($_SESSION['admin_username']); ?>
-        </h1>
+        </h2>
 
         <div class="stats-grid">
             <div class="stat-card">
