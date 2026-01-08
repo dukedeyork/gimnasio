@@ -3255,3 +3255,17 @@ ol {
 		font-size: 28px;
 	}
 }
+
+
+
+/* Para navegadores basados en WebKit (Chrome, Safari, Edge) agregado para remover las flechas de + y - en los form */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Para Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
