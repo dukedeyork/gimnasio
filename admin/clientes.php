@@ -179,6 +179,7 @@ $result = $conn->query($sql);
                             <th>#</th>
                             <th>Nombre</th>
                             <th>DNI</th>
+                            <th>Teléfono</th>
                             <th>Género</th>
                             <th>Plan</th>
                             <th>Fecha Ingreso</th>
@@ -239,6 +240,9 @@ $result = $conn->query($sql);
                                 </td>
                                 <td>
                                     <?php echo htmlspecialchars($row['dni']); ?>
+                                </td>
+                                <td>
+                                    <?php echo htmlspecialchars($row['telefono']); ?>
                                 </td>
                                 <td>
                                     <?php echo ucfirst(htmlspecialchars(isset($row['genero']) ? $row['genero'] : 'hombre')); ?>

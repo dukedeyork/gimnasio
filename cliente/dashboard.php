@@ -188,10 +188,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
     <nav class="nav">
         <div class="brand">Gimnasio - Mi Cuenta</div>
         <div>
-            <span>Hola,
+            <span style="text-transform: uppercase;">Hola,
                 <?php echo htmlspecialchars($cliente['nombre']); ?>
             </span>
-            <a href="logout.php">Cerrar Sesión</a>
+            <a href="logout.php" style="text-transform: uppercase;">Cerrar Sesión</a>
         </div>
     </nav>
 
