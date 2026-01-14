@@ -16,6 +16,7 @@ $fecha_nacimiento = '';
 $genero = 'hombre'; // Default
 $tipo_plan = 1;
 $fecha_ingreso = date('Y-m-d'); // Default to today
+$activo = 1; // Default active
 $is_edit = false;
 $msg = '';
 $error = '';
@@ -40,6 +41,7 @@ if (isset($_GET['id'])) {
         $genero = isset($row['genero']) ? $row['genero'] : 'hombre';
         $tipo_plan = isset($row['tipo_plan']) ? $row['tipo_plan'] : 1;
         $fecha_ingreso = isset($row['fecha_ingreso']) ? $row['fecha_ingreso'] : date('Y-m-d');
+        $activo = isset($row['activo']) ? $row['activo'] : 1;
     }
     $stmt->close();
 }
@@ -55,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $genero = $_POST['genero'];
     $tipo_plan = intval($_POST['tipo_plan']);
     $fecha_ingreso = $_POST['fecha_ingreso'];
+    $activo = intval($_POST['activo']);
     $password = $_POST['password'];
 
     if (empty($nombre) || empty($apellido) || empty($dni)) {
@@ -63,13 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($is_edit) {
             // Update
             // Password only updated if not empty
+            // Types: s(nombre), s(apellido), s(dni), s(email), s(telefono), s(fecha_nacimiento), s(genero), i(tipo_plan), s(fecha_ingreso), i(activo), s(pass), i(id)
             if (!empty($password)) {
                 $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=?, password=? WHERE id=?");
-                $stmt->bind_param("sssssssissi", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $hashed_pass, $id);
+                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=?, activo=?, password=? WHERE id=?");
+                $stmt->bind_param("sssssssissii", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $activo, $hashed_pass, $id);
             } else {
-                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=? WHERE id=?");
-                $stmt->bind_param("sssssssisi", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $id);
+                // Types: s(nombre), s(apellido), s(dni), s(email), s(telefono), s(fecha_nacimiento), s(genero), i(tipo_plan), s(fecha_ingreso), i(activo), i(id)
+                $stmt = $conn->prepare("UPDATE clientes SET nombre=?, apellido=?, dni=?, email=?, telefono=?, fecha_nacimiento=?, genero=?, tipo_plan=?, fecha_ingreso=?, activo=? WHERE id=?");
+                $stmt->bind_param("sssssssisii", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $activo, $id);
             }
 
             if ($stmt->execute()) {
@@ -80,8 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Insert
             $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO clientes (nombre, apellido, dni, email, telefono, fecha_nacimiento, genero, tipo_plan, fecha_ingreso, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssiss", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $hashed_pass);
+            // Types: s(nombre), s(apellido), s(dni), s(email), s(telefono), s(fecha_nacimiento), s(genero), i(tipo_plan), s(fecha_ingreso), i(activo), s(pass)
+            $stmt = $conn->prepare("INSERT INTO clientes (nombre, apellido, dni, email, telefono, fecha_nacimiento, genero, tipo_plan, fecha_ingreso, activo, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssisis", $nombre, $apellido, $dni, $email, $telefono, $fecha_nacimiento, $genero, $tipo_plan, $fecha_ingreso, $activo, $hashed_pass);
 
             if ($stmt->execute()) {
                 $msg = "Cliente creado exitosamente.";
@@ -293,6 +299,16 @@ $conn->close();
         </div>
 
         <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="activo">Estado</label>
+                <select id="activo" name="activo">
+                    <option value="1" <?php echo ($activo == 1) ? 'selected' : ''; ?>>Activo</option>
+                    <option value="0" <?php echo ($activo == 0) ? 'selected' : ''; ?>>Inactivo</option>
+                </select>
+            </div>
+        </div>
 
         <div class="form-row">
             <div class="form-group">

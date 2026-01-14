@@ -7,24 +7,46 @@ if (!isset($_SESSION['admin_id'])) {
 require_once 'config.php';
 
 // Lógica de Eliminación
+// Lógica de Eliminación (ahora es desactivación) - Mantenemos esto o lo integramos con el cambio de estado?
+// Si se pide 'delete', lo marcamos como inactivo (0).
+// Lógica de Eliminación (Borrado Físico)
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     $conn = getDB();
-    // Borrado lógico o físico? El requerimiento dice eliminar. Hacemos borrado físico para simplificar o update activo=0.
-    // Usualmente mejor activo=0.
-    $stmt = $conn->prepare("UPDATE clientes SET activo = 0 WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM clientes WHERE id = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
-        $msg = "Cliente eliminado correctamente.";
+        if ($stmt->affected_rows > 0) {
+            $msg = "Cliente eliminado permanentemente.";
+        } else {
+            $msg = "El cliente no existe o ya fue eliminado.";
+        }
     } else {
-        $error = "Error al eliminar.";
+        $error = "Error al eliminar: " . $conn->error;
+    }
+    $stmt->close();
+    $conn->close();
+}
+
+// Lógica para cambio de estado mediante selector
+if (isset($_POST['update_status']) && isset($_POST['cliente_id']) && isset($_POST['nuevo_estado'])) {
+    $id = intval($_POST['cliente_id']);
+    $estado = intval($_POST['nuevo_estado']); // 0 o 1
+    $conn = getDB();
+    $stmt = $conn->prepare("UPDATE clientes SET activo = ? WHERE id = ?");
+    $stmt->bind_param("ii", $estado, $id);
+    if ($stmt->execute()) {
+        $msg = "Estado actualizado correctamente.";
+    } else {
+        $error = "Error al actualizar estado.";
     }
     $stmt->close();
     $conn->close();
 }
 
 $conn = getDB();
-$sql = "SELECT * FROM clientes WHERE activo = 1 ORDER BY id DESC";
+// Mostrar todos (activos e inactivos)
+$sql = "SELECT * FROM clientes ORDER BY activo DESC, id DESC";
 $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
@@ -185,6 +207,7 @@ $result = $conn->query($sql);
                             <th>Fecha Ingreso</th>
                             <th>Transcurrido</th>
                             <th>Restante</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -235,7 +258,7 @@ $result = $conn->query($sql);
                                 <td>
                                     <?php echo $row['id']; ?>
                                 </td>
-                                <td>
+                                <td style="text-transform: capitalize;">
                                     <?php echo htmlspecialchars($row['nombre'] . ' ' . $row['apellido']); ?>
                                 </td>
                                 <td>
@@ -258,6 +281,20 @@ $result = $conn->query($sql);
                                 </td>
                                 <td style="color: <?php echo $color_restante; ?>; font-weight: bold;">
                                     <?php echo $restante_str; ?>
+                                </td>
+                                <td>
+                                    <form method="POST" action="" style="margin:0;">
+                                        <input type="hidden" name="cliente_id" value="<?php echo $row['id']; ?>">
+                                        <input type="hidden" name="update_status" value="1">
+                                        <select name="nuevo_estado" onchange="this.form.submit()"
+                                            style="padding: 0.25rem; border-radius: 4px; border: 1px solid #ccc; 
+                                                       background-color: <?php echo $row['activo'] ? '#d1fae5' : '#fee2e2'; ?>; 
+                                                       color: <?php echo $row['activo'] ? '#065f46' : '#991b1b'; ?>; font-weight:bold;">
+                                            <option value="1" <?php echo $row['activo'] ? 'selected' : ''; ?>>Activo</option>
+                                            <option value="0" <?php echo !$row['activo'] ? 'selected' : ''; ?>>Inactivo
+                                            </option>
+                                        </select>
+                                    </form>
                                 </td>
                                 <td class="actions">
                                     <a href="asignar_rutinas.php?cliente_id=<?php echo $row['id']; ?>" class="btn"

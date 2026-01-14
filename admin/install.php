@@ -58,6 +58,7 @@ $queries[] = "CREATE TABLE IF NOT EXISTS cliente_rutinas (
 // Intentamos agregar las columnas nuevas. Si ya existen, MySQL devolverá error, lo capturaremos/ignoraremos.
 $migrations = [];
 $migrations[] = "ALTER TABLE clientes ADD COLUMN genero ENUM('hombre', 'mujer') DEFAULT 'hombre' AFTER fecha_nacimiento";
+$migrations[] = "ALTER TABLE clientes ADD COLUMN activo TINYINT(1) DEFAULT 1 AFTER fecha_registro";
 $migrations[] = "ALTER TABLE clientes ADD COLUMN tipo_plan INT DEFAULT 1 AFTER activo";
 $migrations[] = "ALTER TABLE clientes ADD COLUMN fecha_ingreso DATE DEFAULT NULL AFTER tipo_plan";
 $migrations[] = "ALTER TABLE clientes ADD COLUMN password VARCHAR(255) DEFAULT NULL";
@@ -117,45 +118,45 @@ $queries[] = "INSERT INTO admin_users (username, password)
     <div class="container">
         <h1>Instalación del Sistema</h1>
         <ul>
-        <?php
-        // Ejecutar creación de tablas (Critico)
-        foreach ($queries as $sql) {
-            if ($conn->query($sql) === TRUE) {
-                $msg = "Operación ejecutada correctamente.";
-                if (strpos($sql, 'CREATE TABLE') !== false) {
-                    preg_match('/CREATE TABLE IF NOT EXISTS (\w+)/', $sql, $matches);
-                    $tableName = $matches[1] ?? 'tabla';
-                    $msg = "Tabla <strong>$tableName</strong> verificada/creada.";
-                } elseif (strpos($sql, 'INSERT INTO') !== false) {
-                    $msg = "Usuario administrador verificado/creado.";
-                }
-                echo "<li><span class='success'>✔</span> $msg</li>";
-            } else {
-                echo "<li><span class='error'>✘</span> Error Crítico: " . $conn->error . "</li>";
-            }
-        }
-
-        // Ejecutar Migraciones (Puede fallar si ya existen columnas, es normal)
-        if (!empty($migrations)) {
-            echo "<h4>Verificando actualizaciones de esquema...</h4>";
-            foreach ($migrations as $sql) {
-                // Suprimimos errores visuales directos, verificamos el código de error
-                try {
-                    if ($conn->query($sql) === TRUE) {
-                        echo "<li><span class='success'>✔</span> Columna agregada o actualizada.</li>";
-                    } else {
-                        // Error 1060: Duplicate column name
-                        if ($conn->errno == 1060) {
-                            echo "<li><span class='success'>✔</span> Columna ya existe (Verificado).</li>";
-                        } else {
-                            echo "<li><span style='color:orange'>⚠</span> Nota: " . $conn->error . "</li>";
-                        }
+            <?php
+            // Ejecutar creación de tablas (Critico)
+            foreach ($queries as $sql) {
+                if ($conn->query($sql) === TRUE) {
+                    $msg = "Operación ejecutada correctamente.";
+                    if (strpos($sql, 'CREATE TABLE') !== false) {
+                        preg_match('/CREATE TABLE IF NOT EXISTS (\w+)/', $sql, $matches);
+                        $tableName = $matches[1] ?? 'tabla';
+                        $msg = "Tabla <strong>$tableName</strong> verificada/creada.";
+                    } elseif (strpos($sql, 'INSERT INTO') !== false) {
+                        $msg = "Usuario administrador verificado/creado.";
                     }
-                } catch (Exception $e) {
-                     echo "<li><span style='color:orange'>⚠</span> Nota: " . $e->getMessage() . "</li>";
+                    echo "<li><span class='success'>✔</span> $msg</li>";
+                } else {
+                    echo "<li><span class='error'>✘</span> Error Crítico: " . $conn->error . "</li>";
                 }
             }
-        }
+
+            // Ejecutar Migraciones (Puede fallar si ya existen columnas, es normal)
+            if (!empty($migrations)) {
+                echo "<h4>Verificando actualizaciones de esquema...</h4>";
+                foreach ($migrations as $sql) {
+                    // Suprimimos errores visuales directos, verificamos el código de error
+                    try {
+                        if ($conn->query($sql) === TRUE) {
+                            echo "<li><span class='success'>✔</span> Columna agregada o actualizada.</li>";
+                        } else {
+                            // Error 1060: Duplicate column name
+                            if ($conn->errno == 1060) {
+                                echo "<li><span class='success'>✔</span> Columna ya existe (Verificado).</li>";
+                            } else {
+                                echo "<li><span style='color:orange'>⚠</span> Nota: " . $conn->error . "</li>";
+                            }
+                        }
+                    } catch (Exception $e) {
+                        echo "<li><span style='color:orange'>⚠</span> Nota: " . $e->getMessage() . "</li>";
+                    }
+                }
+            }
 
 
             $conn->close();
