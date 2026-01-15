@@ -49,6 +49,7 @@ $queries[] = "CREATE TABLE IF NOT EXISTS cliente_rutinas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     rutina_id INT NOT NULL,
+    dia_entrenamiento INT DEFAULT 1,
     fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
     FOREIGN KEY (rutina_id) REFERENCES rutinas(id) ON DELETE CASCADE
@@ -62,6 +63,7 @@ $migrations[] = "ALTER TABLE clientes ADD COLUMN activo TINYINT(1) DEFAULT 1 AFT
 $migrations[] = "ALTER TABLE clientes ADD COLUMN tipo_plan INT DEFAULT 1 AFTER activo";
 $migrations[] = "ALTER TABLE clientes ADD COLUMN fecha_ingreso DATE DEFAULT NULL AFTER tipo_plan";
 $migrations[] = "ALTER TABLE clientes ADD COLUMN password VARCHAR(255) DEFAULT NULL";
+$migrations[] = "ALTER TABLE cliente_rutinas ADD COLUMN dia_entrenamiento INT DEFAULT 1 AFTER rutina_id";
 
 // Crear usuario admin por defecto si no existe ninguno
 // Password por defecto: admin123

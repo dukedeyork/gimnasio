@@ -223,60 +223,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
         </div>
 
         <?php
-        $stmt = $conn->prepare("SELECT r.nombre_ejercicio, r.musculos, r.peso_sugerido, r.espacio_maquina, r.series, r.repeticiones 
+        $stmt = $conn->prepare("SELECT cr.dia_entrenamiento, r.nombre_ejercicio, r.musculos, r.peso_sugerido, r.espacio_maquina, r.series, r.repeticiones 
                                 FROM cliente_rutinas cr 
                                 JOIN rutinas r ON cr.rutina_id = r.id 
                                 WHERE cr.cliente_id = ? 
-                                ORDER BY cr.fecha_asignacion ASC");
+                                ORDER BY cr.dia_entrenamiento ASC, cr.fecha_asignacion ASC");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        $rutinas = $stmt->get_result();
+        $res_rutinas = $stmt->get_result();
+
+        $rutinas_por_dia = [];
+        if ($res_rutinas->num_rows > 0) {
+            while ($r = $res_rutinas->fetch_assoc()) {
+                $rutinas_por_dia[$r['dia_entrenamiento']][] = $r;
+            }
+        }
+        $stmt->close();
         ?>
 
         <div class="card">
             <h2 class="h2-title">Mi Rutina Asignada</h2>
-            <?php if ($rutinas->num_rows > 0): ?>
-                <div style="overflow-x:auto;">
-                    <table style="width:100%; border-collapse: collapse; text-align: left;">
-                        <thead>
-                            <tr style="background:#f9f9f9; border-bottom:1px solid #eee;">
-                                <th style="padding:0.75rem; width: 50px; text-align: center;">Estado</th>
-                                <th style="padding:0.75rem;">Ejercicio</th>
-                                <th style="padding:0.75rem;">Series / Reps</th>
-                                <th style="padding:0.75rem;">Peso</th>
-                                <th style="padding:0.75rem;">Máquina/Espacio</th>
-                                <th style="padding:0.75rem;">Músculos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($r = $rutinas->fetch_assoc()): 
-                                // ID único para persistencia local: rutina + parámetros
-                                $chk_id = 'chk_' . md5($r['nombre_ejercicio'] . $r['series'] . $r['repeticiones']);
-                            ?>
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <td style="padding:0.75rem; text-align:center;">
-                                        <input type="checkbox" id="<?php echo $chk_id; ?>" class="routine-check" 
-                                            style="transform: scale(1.5); cursor: pointer; accent-color: #f36100;">
-                                    </td>
-                                    <td style="padding:0.75rem; font-weight:bold; color:#f36100;">
-                                        <?php echo htmlspecialchars($r['nombre_ejercicio']); ?>
-                                    </td>
-                                    <td style="padding:0.75rem;"><?php echo $r['series']; ?> x <?php echo $r['repeticiones']; ?>
-                                    </td>
-                                    <td style="padding:0.75rem;"><?php echo htmlspecialchars($r['peso_sugerido']); ?></td>
-                                    <td style="padding:0.75rem;"><?php echo htmlspecialchars($r['espacio_maquina']); ?></td>
-                                    <td style="padding:0.75rem; font-size:0.9rem; color:#666;">
-                                        <?php echo htmlspecialchars($r['musculos']); ?>
-                                    </td>
+            <?php if (!empty($rutinas_por_dia)): ?>
+                <?php foreach ($rutinas_por_dia as $dia => $ejercicios): ?>
+                    <h3
+                        style="background: #f36100; color: white; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1.5rem; display: inline-block;">
+                        Día <?php echo $dia; ?>
+                    </h3>
+                    <div style="overflow-x:auto; margin-bottom: 1rem;">
+                        <table style="width:100%; border-collapse: collapse; text-align: left; margin-top: 0.5rem;">
+                            <thead>
+                                <tr style="background:#f9f9f9; border-bottom:1px solid #eee;">
+                                    <th style="padding:0.75rem; width: 50px; text-align: center;">Estado</th>
+                                    <th style="padding:0.75rem;">Ejercicio</th>
+                                    <th style="padding:0.75rem;">Series / Reps</th>
+                                    <th style="padding:0.75rem;">Peso</th>
+                                    <th style="padding:0.75rem;">Máquina/Espacio</th>
+                                    <th style="padding:0.75rem;">Músculos</th>
                                 </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($ejercicios as $r):
+                                    // ID único para persistencia local: dia + rutina + params
+                                    $chk_id = 'chk_d' . $dia . '_' . md5($r['nombre_ejercicio'] . $r['series'] . $r['repeticiones']);
+                                    ?>
+                                    <tr style="border-bottom:1px solid #eee;">
+                                        <td style="padding:0.75rem; text-align:center;">
+                                            <input type="checkbox" id="<?php echo $chk_id; ?>" class="routine-check"
+                                                style="transform: scale(1.5); cursor: pointer; accent-color: #f36100;">
+                                        </td>
+                                        <td style="padding:0.75rem; font-weight:bold; color:#f36100;">
+                                            <?php echo htmlspecialchars($r['nombre_ejercicio']); ?>
+                                        </td>
+                                        <td style="padding:0.75rem;"><?php echo $r['series']; ?> x <?php echo $r['repeticiones']; ?>
+                                        </td>
+                                        <td style="padding:0.75rem;"><?php echo htmlspecialchars($r['peso_sugerido']); ?></td>
+                                        <td style="padding:0.75rem;"><?php echo htmlspecialchars($r['espacio_maquina']); ?></td>
+                                        <td style="padding:0.75rem; font-size:0.9rem; color:#666;">
+                                            <?php echo htmlspecialchars($r['musculos']); ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endforeach; ?>
             <?php else: ?>
                 <p style="color:#666;">Aún no tienes rutinas asignadas. Habla con tu instructor.</p>
             <?php endif; ?>
-            <?php $stmt->close(); ?>
         </div>
 
         <script>

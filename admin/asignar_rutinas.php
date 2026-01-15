@@ -29,10 +29,11 @@ if (!$cliente) {
 // Agregar Rutina
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rutina_id'])) {
     $rutina_id = intval($_POST['rutina_id']);
+    $dia = isset($_POST['dia']) ? intval($_POST['dia']) : 1;
     // Verificar si ya la tiene asignada para no duplicar (opcional, el requerimiento dice "tantas como quiera", permitimos duplicados?)
     // Asumiremos que puede repetir ejercicio, asi que insert directo.
-    $stmt = $conn->prepare("INSERT INTO cliente_rutinas (cliente_id, rutina_id) VALUES (?, ?)");
-    $stmt->bind_param("ii", $cliente_id, $rutina_id);
+    $stmt = $conn->prepare("INSERT INTO cliente_rutinas (cliente_id, rutina_id, dia_entrenamiento) VALUES (?, ?, ?)");
+    $stmt->bind_param("iii", $cliente_id, $rutina_id, $dia);
     $stmt->execute();
     $stmt->close();
 }
@@ -47,11 +48,11 @@ if (isset($_GET['remove'])) {
 }
 
 // Obtener Rutinas Asignadas
-$sql_asignadas = "SELECT cr.id as asignacion_id, r.nombre_ejercicio, r.series, r.repeticiones, r.peso_sugerido 
+$sql_asignadas = "SELECT cr.id as asignacion_id, cr.dia_entrenamiento, r.nombre_ejercicio, r.series, r.repeticiones, r.peso_sugerido 
                   FROM cliente_rutinas cr 
                   JOIN rutinas r ON cr.rutina_id = r.id 
                   WHERE cr.cliente_id = $cliente_id 
-                  ORDER BY cr.fecha_asignacion ASC";
+                  ORDER BY cr.dia_entrenamiento ASC, cr.fecha_asignacion ASC";
 $res_asignadas = $conn->query($sql_asignadas);
 
 // Obtener Todas las Rutinas (para el select)
@@ -198,6 +199,13 @@ $res_todas = $conn->query($sql_todas);
                         </option>
                     <?php endwhile; ?>
                 </select>
+                <select name="dia" style="max-width: 150px;">
+                    <option value="1">Día 1</option>
+                    <option value="2">Día 2</option>
+                    <option value="3">Día 3</option>
+                    <option value="4">Día 4</option>
+                    <option value="5">Día 5</option>
+                </select>
                 <button type="submit" class="btn-add">Agregar a Rutina</button>
             </form>
         </div>
@@ -208,6 +216,7 @@ $res_todas = $conn->query($sql_todas);
                 <table>
                     <thead>
                         <tr>
+                            <th>Día</th>
                             <th>Ejercicio</th>
                             <th>Series</th>
                             <th>Reps</th>
@@ -218,6 +227,9 @@ $res_todas = $conn->query($sql_todas);
                     <tbody>
                         <?php while ($row = $res_asignadas->fetch_assoc()): ?>
                             <tr>
+                                <td>
+                                    <strong>Día <?php echo $row['dia_entrenamiento']; ?></strong>
+                                </td>
                                 <td>
                                     <?php echo htmlspecialchars($row['nombre_ejercicio']); ?>
                                 </td>
