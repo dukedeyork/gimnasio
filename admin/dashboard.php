@@ -50,7 +50,7 @@ $conn->close();
         }
 
         .container {
-            width: 100%;
+max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
