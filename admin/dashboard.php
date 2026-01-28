@@ -46,7 +46,7 @@ $conn->close();
         .admin-nav .brand {
             font-size: 1.25rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
         }
 
         .container {
@@ -81,7 +81,7 @@ max-width: 1200px;
         .stat-card .value {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
             margin: 0.5rem 0;
         }
 
@@ -108,7 +108,7 @@ max-width: 1200px;
         .action-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #f36100;
+            border-color: #fa211b;
         }
 
         .action-btn h4 {
@@ -121,7 +121,7 @@ max-width: 1200px;
     <nav class="admin-nav">
         <div class="brand">Gimnasio Admin</div>
         <div class="menu">
-            <a href="dashboard.php" style="color: #f36100;">Dashboard</a>
+            <a href="dashboard.php" style="color: #fa211b;">Dashboard</a>
             <a href="clientes.php">Clientes</a>
             <a href="rutinas.php">Rutinas</a>
             <a href="logout.php">Cerrar Sesión</a>

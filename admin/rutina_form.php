@@ -103,7 +103,7 @@ $conn->close();
         .admin-nav .brand {
             font-size: 1.25rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
         }
 
         .container {
@@ -144,7 +144,7 @@ $conn->close();
         }
 
         .btn-submit {
-            background-color: #f36100;
+            background-color: #fa211b;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -187,7 +187,7 @@ $conn->close();
         <div class="menu">
             <a href="dashboard.php">Dashboard</a>
             <a href="clientes.php">Clientes</a>
-            <a href="rutinas.php" style="color: #f36100;">Rutinas</a>
+            <a href="rutinas.php" style="color: #fa211b;">Rutinas</a>
             <a href="logout.php">Cerrar Sesión</a>
         </div>
     </nav>

@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
         .nav .brand {
             font-size: 1.25rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
         }
 
         .nav a {
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
         }
 
         .h2-title {
-            border-bottom: 2px solid #f36100;
+            border-bottom: 2px solid #fa211b;
             padding-bottom: 0.5rem;
             margin-bottom: 1.5rem;
         }
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
         .stat-value {
             font-size: 2rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
             margin: 0.5rem 0;
         }
 
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
         }
 
         .btn-submit {
-            background-color: #f36100;
+            background-color: #fa211b;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -246,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
             <?php if (!empty($rutinas_por_dia)): ?>
                 <?php foreach ($rutinas_por_dia as $dia => $ejercicios): ?>
                     <h3
-                        style="background: #f36100; color: white; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1.5rem; display: inline-block;">
+                        style="background: #fa211b; color: white; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1.5rem; display: inline-block;">
                         Día <?php echo $dia; ?>
                     </h3>
                     <div style="overflow-x:auto; margin-bottom: 1rem;">
@@ -269,9 +269,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
                                     <tr style="border-bottom:1px solid #eee;">
                                         <td style="padding:0.75rem; text-align:center;">
                                             <input type="checkbox" id="<?php echo $chk_id; ?>" class="routine-check"
-                                                style="transform: scale(1.5); cursor: pointer; accent-color: #f36100;">
+                                                style="transform: scale(1.5); cursor: pointer; accent-color: #fa211b;">
                                         </td>
-                                        <td style="padding:0.75rem; font-weight:bold; color:#f36100;">
+                                        <td style="padding:0.75rem; font-weight:bold; color:#fa211b;">
                                             <?php echo htmlspecialchars($r['nombre_ejercicio']); ?>
                                         </td>
                                         <td style="padding:0.75rem;"><?php echo $r['series']; ?> x <?php echo $r['repeticiones']; ?>

@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../css/style.css">
     <style>
         body.login-body {
-            background-image: linear-gradient(to bottom, #0a0a0a, #f35904 );
+            background-image: linear-gradient(to bottom, #0a0a0a, #fa211b );
             display: flex;
             justify-content: center;
             align-items: center;
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-login {
             width: 100%;
             padding: 0.75rem;
-            background-color: #f36100;
+            background-color: #fa211b;
             color: white;
             border: none;
             border-radius: 4px;
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-login:hover {
-            background-color: #d45300;
+            background-color: #4f8f3bff;
         }
 
         .error-msg {

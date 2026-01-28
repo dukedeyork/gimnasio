@@ -93,7 +93,7 @@ $res_todas = $conn->query($sql_todas);
         .admin-nav .brand {
             font-size: 1.25rem;
             font-weight: bold;
-            color: #f36100;
+            color: #fa211b;
         }
 
         .container {
@@ -134,7 +134,7 @@ $res_todas = $conn->query($sql_todas);
         }
 
         .btn-add {
-            background: #f36100;
+            background: #fa211b;
             color: white;
             border: none;
             padding: 0.5rem 1rem;
@@ -176,7 +176,7 @@ $res_todas = $conn->query($sql_todas);
         <div class="brand">Gimnasio Admin</div>
         <div class="menu">
             <a href="dashboard.php">Dashboard</a>
-            <a href="clientes.php" style="color: #f36100;">Clientes</a>
+            <a href="clientes.php" style="color: #fa211b;">Clientes</a>
             <a href="rutinas.php">Rutinas</a>
             <a href="logout.php">Cerrar Sesión</a>
         </div>
