@@ -67,8 +67,8 @@ $migrations[] = "ALTER TABLE cliente_rutinas ADD COLUMN dia_entrenamiento INT DE
 
 // Crear usuario admin por defecto si no existe ninguno
 // Password por defecto: admin123
-$default_admin_user = 'admin';
-$default_admin_pass = password_hash('admin123', PASSWORD_DEFAULT);
+$default_admin_user = 'MegaFitAdmin';
+$default_admin_pass = password_hash('e5a3572gg876', PASSWORD_DEFAULT);
 
 $queries[] = "INSERT INTO admin_users (username, password) 
               SELECT * FROM (SELECT '$default_admin_user', '$default_admin_pass') AS tmp
