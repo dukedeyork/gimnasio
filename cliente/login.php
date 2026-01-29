@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         body.login-body {
             font-family: sans-serif;
-            background-image: linear-gradient(to bottom, #0a0a0a, #f35904 );
+            background-image: linear-gradient(to bottom, #0a0a0a, #fa211b );
             display: flex;
             justify-content: center;
             align-items: center;
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-login:hover {
-            background-color: #d45300;
+            background-color: #21741aff;
         }
 
         .error-msg {

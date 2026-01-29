@@ -3358,7 +3358,70 @@ ol {
 
 
 
-/* Para navegadores basados en WebKit (Chrome, Safari, Edge) agregado para remover las flechas de + y - en los form */
+/*---------------------
+  Mobile Timetable
+-----------------------*/
+.class-timetable-mobile {
+    margin-bottom: 30px;
+}
+
+.ctm-day {
+    margin-bottom: 25px;
+}
+
+.ctm-day h4 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f36103;
+    display: inline-block;
+}
+
+.ctm-item {
+    background: #1a1a1a;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.ctm-item:hover {
+    border-left: 3px solid #f36103;
+    background: #252525;
+}
+
+.ctm-item.dark-bg {
+    background: #111111;
+}
+
+.ctm-item.blank-item {
+    display: none; /* Hide empty slots on mobile unless desired otherwise */
+}
+
+.ctm-time {
+    color: #f36103;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.ctm-info h5 {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.ctm-info span {
+    color: #c4c4c4;
+    font-size: 14px;
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;

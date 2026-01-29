@@ -135,6 +135,87 @@ $result = $conn->query($sql);
             padding: 3rem;
             color: #6b7280;
         }
+
+        /* Responsive Styles */
+        .mobile-cards {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .admin-nav .menu {
+                margin-top: 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .admin-nav a {
+                margin: 0;
+                font-size: 0.9rem;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-actions h1 {
+                font-size: 1.5rem;
+                margin: 0;
+            }
+
+            table {
+                display: none;
+            }
+
+            .mobile-cards {
+                display: block;
+            }
+
+            .routine-card {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border-left: 4px solid #fa211b;
+            }
+
+            .card-title {
+                font-weight: bold;
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+                color: #111;
+            }
+
+            .card-detail {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+                color: #4b5563;
+            }
+
+            .card-detail strong {
+                color: #111;
+            }
+
+            .card-actions {
+                margin-top: 1rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .card-actions .btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
@@ -161,7 +242,17 @@ $result = $conn->query($sql);
             </div>
         <?php endif; ?>
 
-        <?php if ($result->num_rows > 0): ?>
+        <?php
+        $rutinas = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $rutinas[] = $row;
+            }
+        }
+        ?>
+
+        <?php if (!empty($rutinas)): ?>
+            <!-- Desktop Table -->
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -176,7 +267,7 @@ $result = $conn->query($sql);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
+                        <?php foreach ($rutinas as $row): ?>
                             <tr>
                                 <td>
                                     <?php echo htmlspecialchars($row['nombre_ejercicio']); ?>
@@ -202,10 +293,33 @@ $result = $conn->query($sql);
                                         onclick="return confirm('¿Eliminar este ejercicio?')">Borrar</a>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Mobile Cards -->
+            <div class="mobile-cards">
+                <?php foreach ($rutinas as $row): ?>
+                    <div class="routine-card">
+                        <div class="card-title"><?php echo htmlspecialchars($row['nombre_ejercicio']); ?></div>
+                        <div class="card-detail"><strong>Músculos:</strong> <?php echo htmlspecialchars($row['musculos']); ?>
+                        </div>
+                        <div class="card-detail"><strong>Máquina:</strong>
+                            <?php echo htmlspecialchars($row['espacio_maquina']); ?></div>
+                        <div class="card-detail"><strong>Peso:</strong> <?php echo htmlspecialchars($row['peso_sugerido']); ?>
+                        </div>
+                        <div class="card-detail"><strong>Series/Reps:</strong> <?php echo $row['series']; ?> x
+                            <?php echo $row['repeticiones']; ?></div>
+                        <div class="card-actions">
+                            <a href="rutina_form.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Editar</a>
+                            <a href="rutinas.php?delete=<?php echo $row['id']; ?>" class="btn btn-danger"
+                                onclick="return confirm('¿Eliminar este ejercicio?')">Borrar</a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
         <?php else: ?>
             <div class="empty-state">
                 No hay ejercicios creados.
