@@ -51,10 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Clientes - Gimnasio</title>
+    <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css">
     <style>
         body.login-body {
             font-family: sans-serif;
-            background-image: linear-gradient(to bottom, #0a0a0a, #fa211b );
+            background-image: linear-gradient(to bottom, #0a0a0a, #fa211b);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -95,6 +96,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-sizing: border-box;
         }
 
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #333;
+        }
+
         .btn-login {
             width: 100%;
             padding: 0.75rem;
@@ -131,7 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="login-body">
     <div class="login-card">
-        <a href="../index.html"><img src="../img/logo.png" alt="Logo" style="margin-left:auto; margin-right:auto; display:block"></a>
+        <a href="../index.html"><img src="../img/logo.png" alt="Logo"
+                style="margin-left:auto; margin-right:auto; display:block"></a>
         <h2>Acceso Clientes</h2>
         <?php if ($error): ?>
             <div class="error-msg">
@@ -145,12 +165,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required>
+                    <i class="fa fa-eye password-toggle" id="togglePassword"></i>
+                </div>
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
         </form>
         <a href="../index.html" class="back-link">Volver al sitio</a>
     </div>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function (e) {
+            const password = document.getElementById('password');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // Alternar el icono entre el ojo y el ojo tachado
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 
 </html>
